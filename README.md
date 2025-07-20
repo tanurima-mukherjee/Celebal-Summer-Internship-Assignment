@@ -4,7 +4,7 @@ A simple Streamlit application that uses linear regression to predict house pric
 
 ## 🔗 Live Demo
 
-[Click here to try the app on Streamlit Cloud]([(https://house-price-prediction-by-tanurima-mukherjee-assignment7.streamlit.app/)](https://house-price-prediction-by-tanurima-mukherjee-assignment7.streamlit.app/))
+[Click here to try the app on Streamlit Cloud]([(https://house-price-prediction-by-tanurima-mukherjee-assignment7.streamlit.app/)]
 
 ## Features
 
