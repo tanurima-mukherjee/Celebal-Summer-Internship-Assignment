@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RAG Q&A Chatbot</title>
+    <style>
+        body { font-family: Arial; padding: 20px; max-width: 800px; margin: auto; }
+        .chat-box { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: scroll; margin-bottom: 10px; }
+        input[type="text"] { width: 80%; padding: 8px; }
+        button { padding: 8px 12px; }
+    </style>
+</head>
+<body>
+    <h2>📄 Upload Document and Ask Questions (RAG with Groq)</h2>
+
+    <div id="uploadSection">
+        <input type="file" id="fileInput" name="file" accept=".pdf,.txt,.docx" required />
+    </div>
+
+    <hr>
+
+    <div class="chat-box" id="chatBox"></div>
+    <input type="text" id="questionInput" placeholder="Ask a question..." onkeypress="if(event.key==='Enter') askQuestion()" />
+    <button onclick="askQuestion()">Ask</button>
+
+    <script>
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            const chatBox = document.getElementById('chatBox');
+            chatBox.innerHTML += '<p><b>System:</b> Processing document...</p>';
+            
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.text())
+            .then(data => {
+                chatBox.innerHTML += `<p><b>System:</b> ${data}</p>`;
+                document.getElementById('uploadSection').style.display = 'none';
+                chatBox.scrollTop = chatBox.scrollHeight;
+            })
+            .catch(err => {
+                chatBox.innerHTML += '<p><b>Error:</b> Failed to upload file</p>';
+                console.error(err);
+            });
+        });
+
+        function askQuestion() {
+            const input = document.getElementById('questionInput');
+            const question = input.value.trim();
+            if (!question) return;
+
+            const box = document.getElementById('chatBox');
+            box.innerHTML += `<p><b>You:</b> ${question}</p>`;
+            input.value = '';
+
+            fetch('/ask', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ question })
+            })
+            .then(res => res.json())
+            .then(data => {
+                box.innerHTML += `<p><b>Bot:</b> ${data.response}</p>`;
+                box.scrollTop = box.scrollHeight;
+            })
+            .catch(err => {
+                box.innerHTML += `<p><b>Error:</b> Failed to get response</p>`;
+                console.error(err);
+            });
+        }
+    </script>
+</body>
+</html>
